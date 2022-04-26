@@ -1,5 +1,6 @@
 //Feature 1
 import React, {Component} from "react";
+import Cart from "./Components/Cart";
 import Filter from "./Components/filter";
 import Products from "./Components/Products";
 import data from './data.json';
@@ -9,9 +10,36 @@ class App extends Component {
     super(props);
     this.state = {
       products: data.products,
+      cartItems:[],
       size:"",
       sort:"",
     }
+  }
+
+  addToCart = (product)=>{
+    
+    const cartItems = this.state.cartItems.slice();
+    let alreadyInCart = false;
+    // If item exists then increment count of item
+    cartItems.forEach(item=>{
+      if(item._id === product._id){
+        item.count++;
+        alreadyInCart = true;
+      }
+    });
+    //Item doesnt exist so add it in cart
+    if(!alreadyInCart){
+      cartItems.push({...product,count: 1});
+    }
+    this.setState({
+      cartItems
+    });
+  }
+  removeFromCart=(product)=>{
+    
+    const cartItems = this.state.cartItems.slice()
+    .filter(item=>item._id !== product._id);;
+    this.setState({cartItems});
   }
 
   sortProducts = (event) =>{
@@ -79,11 +107,18 @@ class App extends Component {
               size={this.state.size}
               sort={this.state.sort}
               filterProducts={this.filterProducts}
-              sortProducts={this.sortProducts} />
-              <Products products={this.state.products} />
+              sortProducts={this.sortProducts} 
+              />
+              <Products 
+              products={this.state.products} 
+              addToCart={this.addToCart} 
+              />
             </div>
             <div className="sidebar">
-              cart items
+              <Cart 
+              cartItems={this.state.cartItems}
+              removeFromCart={this.removeFromCart}
+               />
             </div>
           </div>
         </main>
